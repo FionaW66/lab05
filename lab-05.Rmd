@@ -1,7 +1,7 @@
 ---
-title: "Lab 05 - La Quinta is Spanish for next to Denny's, Pt. 2"
-author: "Insert your name here"
-date: "Insert date here"
+title: "Lab 05 - Wrangling spatial data"
+author: "Fiona Wang"
+date: "Feb 19"
 output: github_document
 ---
 
@@ -17,22 +17,40 @@ states <- read_csv("data/states.csv")
 ```
 
 ### Exercise 1
+Filter both data frames and only select Alaska. 
+```{r dnAK}
+dn <- dennys
+dn_ak <- dn %>% 
+  filter(state == "AK")
+nrow(dn_ak)
+```
 
-Remove this text, and add your answer for Exercise 1 here.
-Add code chunks as needed.
-Don't forget to label your code chunk.
-Do not use spaces in code chunk labels.
+There are 3 Denny's locations in Alaska. 
+```{r lqAK}
+lq <- laquinta
+lq_ak <- lq %>% 
+  filter(state == "AK")
+nrow(lq_ak)
+```
+
+There are 2 La Quinta locations in Alaska. 
 
 ### Exercise 2
+We want to calculate how many pairs there are.
+```{r npair}
+npair <- nrow(dn_ak) * nrow(lq_ak)
+npair
+```
 
-Remove this text, and add your answer for Exercise 1 here.
-Add code chunks as needed.
-Don't forget to label your code chunk.
-Do not use spaces in code chunk labels.
+There are 6 pairings between Denny's and La Quinta locations in Alaska. 
 
 ### Exercise 3
-
-...
+Let's join the two data frames. 
+```{r join, warning=FALSE}
+dn_lq_ak <- full_join(dn_ak, lq_ak,
+                      by = "state")
+dn_lq_ak
+```
 
 ### Exercise 4
 
