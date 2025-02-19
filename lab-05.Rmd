@@ -53,15 +53,48 @@ dn_lq_ak
 ```
 
 ### Exercise 4
-
-...
+We would like to know how many observations there are in this newly joined data frame, as well as the names of the variables. 
+```{r}
+nrow(dn_lq_ak)
+names(dn_lq_ak)
+```
+As the two data frames have the same variables, the names have .x or .y to help distinguish. 
 
 ### Exercise 5
-
-...
+Haversine
+```{r Haversine}
+haversine <- function(long1, lat1, long2, lat2, round = 3) {
+  long1 <- long1 * pi / 180
+  lat1 <- lat1 * pi / 180
+  long2 <- long2 * pi / 180
+  lat2 <- lat2 * pi / 180
+  R <- 6371
+  a <- sin((lat2 - lat1) / 2)^2 + cos(lat1) * cos(lat2) * sin((long2 - long1) / 2)^2
+  d <- R * 2 * asin(sqrt(a))
+  return(round(d, round))
+}
+```
 
 ### Exercise 6
+Calculate the distance in each pair.
+```{r distance}
+dn_lq_ak <- dn_lq_ak %>% 
+  mutate(distance = haversine(
+    longitude.x, latitude.x, longitude.y, latitude.y, round = 3
+  ))
+```
 
-...
+Interestingly, I looked up Google map to see if this calculation is correct. However, the distance on google map is always less than what is calculated here. I think it is because we are calculating the sphere, so it's larger.
 
-Add exercise headings as needed.
+### Exercise 7
+Find the minimum distance between a Denny's and La Quinta for each Denny's location. 
+```{r min_distance}
+dn_lq_ak_mindist <- dn_lq_ak %>% 
+  group_by(address.x) %>% 
+  summarize(closest = min(distance))
+print(dn_lq_ak_mindist)
+```
+
+I realized that these distances are rounded to second.
+
+### Exercise 8
