@@ -38,8 +38,8 @@ There are 2 La Quinta locations in Alaska.
 ### Exercise 2
 We want to calculate how many pairs there are.
 ```{r npair}
-npair <- nrow(dn_ak) * nrow(lq_ak)
-npair
+npairak <- nrow(dn_ak) * nrow(lq_ak)
+npairak
 ```
 
 There are 6 pairings between Denny's and La Quinta locations in Alaska. 
@@ -98,3 +98,181 @@ print(dn_lq_ak_mindist)
 I realized that these distances are rounded to second.
 
 ### Exercise 8
+Distribution of the distances (minimums)
+```{r plot}
+summary(dn_lq_ak_mindist$closest)
+dn_lq_ak_mindist %>% 
+  ggplot(aes(y = closest)) +
+  geom_boxplot() +
+  labs(title = "Minimum Distances between a Denny's and a La Quinta", 
+       subtitle = "Alaska",
+       x = NULL,
+       y = "distance") +
+  theme_minimal()
+```
+
+There are only three distances in this data frame, so it's hard to say the distribution. According to the mean (4.41) and the median (5.20), this is a slightly negatively skewed distribution. This makes sense because there is a lower outlier (2.04). After running a boxplot, the 2.04 mi was not counted as an outlier. 
+
+### Exercise 9
+What about North Carolina?   
+First, how many Denny's are there in NC?
+```{r dn_nc}
+dn_nc <- dn %>% 
+  filter(state == "NC")
+nrow(dn_nc)
+```
+
+There are 28 Denny's locations in North Carolina.  
+Next, how many La Quinta are there in NC?
+```{r lq_nc}
+lq_nc <- lq %>% 
+  filter(state == "NC")
+nrow(lq_nc)
+```
+
+There are 12 La Quintas in North Carolina. 
+How many pairs are there for us to calculate the distance?
+```{r npairnc}
+npairnc <- nrow(dn_nc) * nrow(lq_nc)
+npairnc
+```
+
+We will get 336 distances data.     
+Next, let's join the two data frames for NC. 
+```{r joinnc, warning=FALSE}
+dn_lq_nc <- full_join(dn_nc, lq_nc,
+                      by = "state")
+dn_lq_nc
+nrow(dn_lq_nc)
+names(dn_lq_nc)
+```
+
+There are 336 observations, and the variable names are the same as what we did for Alaska.  
+Next, we will calculate the distance, using mutate to create a new variable.
+```{r distancenc}
+dn_lq_nc <- dn_lq_nc %>% 
+  mutate(distance = haversine(
+    longitude.x, latitude.x, longitude.y, latitude.y, round = 3
+  ))
+```
+
+Calculate the minimum distance between Denny's and La Quinta for each Denny's location.
+```{r min_distancenc}
+dn_lq_nc_mindist <- dn_lq_nc %>% 
+  group_by(address.x) %>% 
+  summarize(closest = min(distance))
+print(dn_lq_nc_mindist)
+```
+
+Next, describe the distribution and generate a graph. 
+```{r plotnc}
+summary(dn_lq_nc_mindist$closest)
+dn_lq_nc_mindist %>% 
+  ggplot(aes(y = closest)) +
+  geom_boxplot() +
+  labs(title = "Minimum Distances between a Denny's and a La Quinta", 
+       subtitle = "North Carolina",
+       x = NULL,
+       y = "distance") +
+  theme_minimal()
+```
+
+The min of this distribution is 1.78, which is really close. However, the mean is 65.44, and the median is 53.46. The mean is really big, meaning on average, the distance between Denny's and La Quinta is pretty far.
+
+### Exercise 10
+In this section, we are doing the same thing for Texas. I will not be narrating as much. 
+```{r Texas}
+dn_tx <- dn %>% 
+  filter(state == "TX")
+nrow(dn_tx)
+lq_tx <- lq %>% 
+  filter(state == "TX")
+nrow(lq_tx)
+npairtx <- nrow(dn_tx) * nrow(lq_tx)
+npairtx
+```
+
+There 200 Denny's locations, and 237 La Quinta locations in Texas. There are 47400 pairs for us to calculate the distances, wow!
+
+```{r Texas2, warning=FALSE}
+dn_lq_tx <- full_join(dn_tx, lq_tx,
+                      by = "state")
+dn_lq_tx
+nrow(dn_lq_tx)
+names(dn_lq_tx)
+```
+
+There are a total of 47400 observations!
+
+```{r Texas 3}
+dn_lq_tx <- dn_lq_tx %>% 
+  mutate(distance = haversine(
+    longitude.x, latitude.x, longitude.y, latitude.y, round = 3
+  ))
+dn_lq_tx_mindist <- dn_lq_tx %>% 
+  group_by(address.x) %>% 
+  summarize(closest = min(distance))
+print(dn_lq_tx_mindist)
+
+summary(dn_lq_tx_mindist$closest)
+dn_lq_tx_mindist %>% 
+  ggplot(aes(y = closest)) +
+  geom_boxplot() +
+  labs(title = "Minimum Distances between a Denny's and a La Quinta", 
+       subtitle = "Texas",
+       x = NULL,
+       y = "distance") +
+  theme_minimal()
+```
+
+The minimum is 0.016, that's really close to each other! The mean is 5.79. For a 200-observation data frame, this is unbelievable. This means that in Texas, Denny's and La Quinta tends to be very close to each other in general. From the boxplot, we do see a couple outliers at the higher end.
+
+### Exercise 11
+The state I am interested in is California. More codes and less narrating.
+```{r Cal}
+dn_ca <- dn %>% 
+  filter(state == "CA")
+nrow(dn_ca)
+lq_ca <- lq %>% 
+  filter(state == "CA")
+nrow(lq_ca)
+npairca <- nrow(dn_ca) * nrow(lq_ca)
+npairca
+```
+
+There are 403 Denny's locations and 56 La Quinta locations in California. That gives us 22568 pairs to calculate distances.
+
+```{r Cal2}
+dn_lq_ca <- full_join(dn_ca, lq_ca,
+                      by = "state")
+dn_lq_ca
+nrow(dn_lq_ca)
+names(dn_lq_ca)
+# 22568 observations
+
+dn_lq_ca <- dn_lq_ca %>% 
+  mutate(distance = haversine(
+    longitude.x, latitude.x, longitude.y, latitude.y, round = 3
+  ))
+dn_lq_ca_mindist <- dn_lq_ca %>% 
+  group_by(address.x) %>% 
+  summarize(closest = min(distance))
+print(dn_lq_ca_mindist)
+
+summary(dn_lq_ca_mindist$closest)
+dn_lq_ca_mindist %>% 
+  ggplot(aes(y = closest)) +
+  geom_boxplot() +
+  labs(title = "Minimum Distances between a Denny's and a La Quinta", 
+       subtitle = "California",
+       x = NULL,
+       y = "distance") +
+  theme_minimal()
+```
+
+The minimum is 0.016, quite similar to that of Texas. The mean is 22.08, with a lot of outliers at the higher end. On average, the distance between Denny's and La Quinta is not that close to each other. 
+
+### Exercise 12
+In this exercise, we compared four states: Alaska, North Carolina, Texas, and California. I would say that Mitch Hedberg's joke holds true for Alaska. The reasoning is that we examined three distances for Alaska, and all of them are no further than 6 mi. This shows that this joke applies to all instances. For other states, even though they might have similar mean scores, the variance is much larger. The extent to which this joke applies to the four states, I gave them a ranking: Alaska > Texas > California > North Carolina.
+
+Thanks for reading.   
